@@ -2,86 +2,90 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Ambulance Traffic Tracker (Simulated)</title>
+  <title>Power Outage Checker</title>
   <style>
-    body, html {
+    body {
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      height: 100%;
-      font-family: Arial, sans-serif;
-    }
-    #map {
-      height: 90vh;
-      width: 100%;
-    }
-    #info {
-      padding: 10px;
+      background-color: #f2f2f2;
       text-align: center;
-      background-color: #f4f4f4;
     }
-    .status {
+    h1 {
+      background-color: #333;
+      color: white;
+      padding: 20px;
+    }
+    #statusBox {
+      margin-top: 50px;
+    }
+    #checkButton {
+      padding: 15px 25px;
+      font-size: 18px;
+      cursor: pointer;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    #result {
+      margin-top: 30px;
+      font-size: 20px;
       font-weight: bold;
+    }
+    .ok {
+      color: green;
+    }
+    .outage {
       color: red;
     }
   </style>
 </head>
 <body>
 
-<div id="info">
-  <h2>🚑 Ambulance Traffic Monitor (Simulation)</h2>
-  <p>Status: <span class="status" id="status">Checking traffic...</span></p>
-</div>
+  <h1>⚡ Power Outage Checker (Simulated)</h1>
 
-<div id="map"></div>
+  <div id="statusBox">
+    <button id="checkButton">Check for Power Outage</button>
+    <div id="result"></div>
+  </div>
 
-<script>
-  let map;
-  let ambulanceMarker;
-
-  function initMap() {
-    // Simulated ambulance location (choose a busy traffic location)
-    const ambulanceLocation = { lat: 28.6139, lng: 77.2090 }; // Connaught Place, Delhi (busy area)
-
-    // Create map
-    map = new google.maps.Map(document.getElementById("map"), {
-      zoom: 15,
-      center: ambulanceLocation,
-      mapTypeId: 'roadmap'
-    });
-
-    // Add traffic layer
-    const trafficLayer = new google.maps.TrafficLayer();
-    trafficLayer.setMap(map);
-
-    // Ambulance marker
-    ambulanceMarker = new google.maps.Marker({
-      position: ambulanceLocation,
-      map,
-      title: "Ambulance",
-      icon: {
-        url: "https://maps.google.com/mapfiles/kml/shapes/truck.png", // Ambulance icon
-        scaledSize: new google.maps.Size(40, 40)
+  <script>
+    document.getElementById('checkButton').addEventListener('click', () => {
+      const resultBox = document.getElementById('result');
+      resultBox.textContent = "Checking your location...";
+      
+      if (!navigator.geolocation) {
+        resultBox.textContent = "Geolocation not supported by your browser.";
+        return;
       }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+
+          // Simulate outage check based on coordinates (for demo)
+          // You can replace this with a real API call here
+
+          // Simulate that some locations are having outage (e.g., lat % 2 === 0)
+          const isOutage = Math.round(latitude + longitude) % 2 === 0;
+
+          setTimeout(() => {
+            if (isOutage) {
+              resultBox.innerHTML = `<span class="outage">🚨 Power outage detected in your area!</span><br>
+              (Lat: ${latitude.toFixed(3)}, Lng: ${longitude.toFixed(3)})`;
+            } else {
+              resultBox.innerHTML = `<span class="ok">✅ No power outage in your area.</span><br>
+              (Lat: ${latitude.toFixed(3)}, Lng: ${longitude.toFixed(3)})`;
+            }
+          }, 2000);
+        },
+        (error) => {
+          resultBox.textContent = "Unable to get your location. Please enable GPS.";
+        }
+      );
     });
-
-    // Simulate checking traffic
-    checkIfStuck();
-  }
-
-  // This function simulates checking the ambulance's traffic status
-  function checkIfStuck() {
-    // Simulated logic: always assume it's stuck for this demo
-    // In real-life, you'd use real-time speed and traffic congestion API
-    setTimeout(() => {
-      document.getElementById("status").innerText = "Ambulance might be stuck in heavy traffic!";
-    }, 3000);
-  }
-</script>
-
-<!-- Google Maps API -->
-<script async defer
-  src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&callback=initMap">
-</script>
+  </script>
 
 </body>
 </html>
