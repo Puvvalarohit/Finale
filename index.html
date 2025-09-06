@@ -1,91 +1,145 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Power Outage Checker</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Engineering College Enrollment Form</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
       margin: 0;
       padding: 0;
-      background-color: #f2f2f2;
+    }
+
+    .container {
+      max-width: 600px;
+      background: #fff;
+      margin: 40px auto;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
       text-align: center;
+      color: #004080;
     }
-    h1 {
-      background-color: #333;
-      color: white;
-      padding: 20px;
-    }
-    #statusBox {
-      margin-top: 50px;
-    }
-    #checkButton {
-      padding: 15px 25px;
-      font-size: 18px;
-      cursor: pointer;
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 5px;
-    }
-    #result {
-      margin-top: 30px;
-      font-size: 20px;
+
+    label {
+      display: block;
+      margin-top: 15px;
       font-weight: bold;
     }
-    .ok {
-      color: green;
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
-    .outage {
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      background-color: #004080;
+      color: #fff;
+      border: none;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0059b3;
+    }
+
+    .success {
+      margin-top: 20px;
+      color: green;
+      text-align: center;
+    }
+
+    .error {
       color: red;
+      font-size: 14px;
+      margin-top: 5px;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h2>Engineering College Enrollment Form</h2>
+    <form id="enrollmentForm">
+      <label for="fullName">Full Name *</label>
+      <input type="text" id="fullName" name="fullName" required />
 
-  <h1>⚡ Power Outage Checker (Simulated)</h1>
+      <label for="email">Email Address *</label>
+      <input type="email" id="email" name="email" required />
 
-  <div id="statusBox">
-    <button id="checkButton">Check for Power Outage</button>
-    <div id="result"></div>
+      <label for="phone">Phone Number *</label>
+      <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" placeholder="10-digit number" required />
+
+      <label for="dob">Date of Birth *</label>
+      <input type="date" id="dob" name="dob" required />
+
+      <label for="gender">Gender *</label>
+      <select id="gender" name="gender" required>
+        <option value="">-- Select --</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <label for="course">Select Engineering Course *</label>
+      <select id="course" name="course" required>
+        <option value="">-- Choose Course --</option>
+        <option value="Computer Science">Computer Science</option>
+        <option value="Electrical Engineering">Electrical Engineering</option>
+        <option value="Mechanical Engineering">Mechanical Engineering</option>
+        <option value="Civil Engineering">Civil Engineering</option>
+        <option value="Electronics and Communication">Electronics and Communication</option>
+      </select>
+
+      <label for="address">Address</label>
+      <textarea id="address" name="address" rows="3" placeholder="Optional"></textarea>
+
+      <button type="submit">Submit Application</button>
+    </form>
+    <div class="success" id="successMessage"></div>
   </div>
 
   <script>
-    document.getElementById('checkButton').addEventListener('click', () => {
-      const resultBox = document.getElementById('result');
-      resultBox.textContent = "Checking your location...";
-      
-      if (!navigator.geolocation) {
-        resultBox.textContent = "Geolocation not supported by your browser.";
+    document.getElementById('enrollmentForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const fullName = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const dob = document.getElementById('dob').value;
+      const gender = document.getElementById('gender').value;
+      const course = document.getElementById('course').value;
+
+      if (!fullName || !email || !phone || !dob || !gender || !course) {
+        alert("Please fill out all required fields.");
         return;
       }
 
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
+      // Basic phone validation
+      if (!/^\d{10}$/.test(phone)) {
+        alert("Please enter a valid 10-digit phone number.");
+        return;
+      }
 
-          // Simulate outage check based on coordinates (for demo)
-          // You can replace this with a real API call here
+      // Success message
+      document.getElementById('successMessage').textContent =
+        `Thank you, ${fullName}. Your application for ${course} has been submitted!`;
 
-          // Simulate that some locations are having outage (e.g., lat % 2 === 0)
-          const isOutage = Math.round(latitude + longitude) % 2 === 0;
-
-          setTimeout(() => {
-            if (isOutage) {
-              resultBox.innerHTML = `<span class="outage">🚨 Power outage detected in your area!</span><br>
-              (Lat: ${latitude.toFixed(3)}, Lng: ${longitude.toFixed(3)})`;
-            } else {
-              resultBox.innerHTML = `<span class="ok">✅ No power outage in your area.</span><br>
-              (Lat: ${latitude.toFixed(3)}, Lng: ${longitude.toFixed(3)})`;
-            }
-          }, 2000);
-        },
-        (error) => {
-          resultBox.textContent = "Unable to get your location. Please enable GPS.";
-        }
-      );
+      // Optionally reset form
+      document.getElementById('enrollmentForm').reset();
     });
   </script>
-
 </body>
 </html>
