@@ -1,111 +1,87 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Nearby Hospitals and Pharmacies</title>
+  <title>Ambulance Traffic Tracker (Simulated)</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    body, html {
       margin: 0;
       padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
     }
     #map {
-      height: 70vh;
+      height: 90vh;
       width: 100%;
     }
-    #places {
+    #info {
       padding: 10px;
+      text-align: center;
+      background-color: #f4f4f4;
     }
-    h2 {
-      margin-top: 10px;
-    }
-    .place {
-      border-bottom: 1px solid #ccc;
-      padding: 5px 0;
+    .status {
+      font-weight: bold;
+      color: red;
     }
   </style>
 </head>
 <body>
-  <h2 style="text-align:center;">Nearby Hospitals and Pharmacies</h2>
-  <div id="map"></div>
-  <div id="places">
-    <h3>Places List</h3>
-    <div id="list"></div>
-  </div>
 
-  <script>
-    let map;
-    let service;
-    let infowindow;
+<div id="info">
+  <h2>🚑 Ambulance Traffic Monitor (Simulation)</h2>
+  <p>Status: <span class="status" id="status">Checking traffic...</span></p>
+</div>
 
-    function initMap() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          const userLocation = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
+<div id="map"></div>
 
-          map = new google.maps.Map(document.getElementById("map"), {
-            center: userLocation,
-            zoom: 14,
-          });
+<script>
+  let map;
+  let ambulanceMarker;
 
-          // Marker for user location
-          new google.maps.Marker({
-            position: userLocation,
-            map,
-            title: "You are here",
-            icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-          });
+  function initMap() {
+    // Simulated ambulance location (choose a busy traffic location)
+    const ambulanceLocation = { lat: 28.6139, lng: 77.2090 }; // Connaught Place, Delhi (busy area)
 
-          const request = {
-            location: userLocation,
-            radius: '2000',
-            type: ['hospital', 'pharmacy'],
-          };
+    // Create map
+    map = new google.maps.Map(document.getElementById("map"), {
+      zoom: 15,
+      center: ambulanceLocation,
+      mapTypeId: 'roadmap'
+    });
 
-          service = new google.maps.places.PlacesService(map);
-          service.nearbySearch(request, handleResults);
-        }, () => {
-          alert("Geolocation failed. Please enable location services.");
-        });
-      } else {
-        alert("Geolocation not supported by this browser.");
+    // Add traffic layer
+    const trafficLayer = new google.maps.TrafficLayer();
+    trafficLayer.setMap(map);
+
+    // Ambulance marker
+    ambulanceMarker = new google.maps.Marker({
+      position: ambulanceLocation,
+      map,
+      title: "Ambulance",
+      icon: {
+        url: "https://maps.google.com/mapfiles/kml/shapes/truck.png", // Ambulance icon
+        scaledSize: new google.maps.Size(40, 40)
       }
-    }
+    });
 
-    function handleResults(results, status) {
-      if (status === google.maps.places.PlacesServiceStatus.OK) {
-        const listDiv = document.getElementById("list");
-        listDiv.innerHTML = '';
-        results.forEach(place => {
-          // Add marker
-          const marker = new google.maps.Marker({
-            map,
-            position: place.geometry.location,
-          });
+    // Simulate checking traffic
+    checkIfStuck();
+  }
 
-          // Info window
-          const infowindow = new google.maps.InfoWindow({
-            content: `<strong>${place.name}</strong><br>${place.vicinity}`,
-          });
+  // This function simulates checking the ambulance's traffic status
+  function checkIfStuck() {
+    // Simulated logic: always assume it's stuck for this demo
+    // In real-life, you'd use real-time speed and traffic congestion API
+    setTimeout(() => {
+      document.getElementById("status").innerText = "Ambulance might be stuck in heavy traffic!";
+    }, 3000);
+  }
+</script>
 
-          marker.addListener("click", () => {
-            infowindow.open(map, marker);
-          });
+<!-- Google Maps API -->
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&callback=initMap">
+</script>
 
-          // Add to list
-          const div = document.createElement("div");
-          div.className = "place";
-          div.innerHTML = `<strong>${place.name}</strong><br>${place.vicinity}`;
-          listDiv.appendChild(div);
-        });
-      } else {
-        alert("Places search failed: " + status);
-      }
-    }
-  </script>
-
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&libraries=places&callback=initMap" async defer></script>
 </body>
 </html>
